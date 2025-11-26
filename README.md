@@ -12,12 +12,20 @@ npm install
 
 ---
 
-## ⚙️ 3. Crear el Archivo `.env`
+## ⚙️ Crear el Archivo `.env`
 ```
 
 Ajustar los valores según tu entorno de PostgreSQL.
 
 ---
+
+## Seeds 
+
+Para poblar las tablas de catálogos (`tipo_pregunta`, `estado_pregunta`, `dificultad`, `categoria_edad`, `clasificacion`) ejecutar:
+
+```bash
+npm run seed:catalogos
+```
 
 ## Estructura de Archivos del Proyecto
 
