@@ -1,6 +1,55 @@
 import bcrypt from "bcrypt";
 import { query } from "../config/db.js";
 
+export const register = async (req, res) => {
+  try {
+    const { nombre, apellido, correo, contrasena, rol } = req.body;
+
+    if (!nombre || !apellido || !correo || !contrasena) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nombre, apellido, correo y contraseña son requeridos",
+      });
+    }
+
+    const existing = await query(
+      "SELECT id_persona FROM persona WHERE correo = $1",
+      [correo]
+    );
+
+    if (existing.rows.length > 0) {
+      return res
+        .status(409)
+        .json({ ok: false, message: "El correo ya está registrado" });
+    }
+
+    const hash = await bcrypt.hash(contrasena, 10);
+    const rolFinal = rol || "Participante";
+
+    const result = await query(
+      `INSERT INTO persona (nombre, apellido, correo, contrasena_hash, rol)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id_persona, nombre, apellido, correo, rol`,
+      [nombre, apellido, correo, hash, rolFinal]
+    );
+
+    const persona = result.rows[0];
+
+    req.session.user = {
+      id_persona: persona.id_persona,
+      nombre: persona.nombre,
+      apellido: persona.apellido,
+      correo: persona.correo,
+      rol: persona.rol,
+    };
+
+    return res.status(201).json({ ok: true, user: req.session.user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ ok: false, message: "Error en el servidor" });
+  }
+};
+
 export const login = async (req, res) => {
   try {
     const { correo, contrasena } = req.body;
@@ -75,4 +124,3 @@ export const me = (req, res) => {
 
   return res.json({ ok: true, user: req.session.user });
 };
-
