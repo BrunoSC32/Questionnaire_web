@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import { query } from "../config/db.js";
 
+const ROLES_PERMITIDOS = ["Editor", "Gestor", "Administrador", "Participante"];
+
 export const register = async (req, res) => {
   try {
     const { nombre, apellido, correo, contrasena, rol } = req.body;
@@ -23,8 +25,17 @@ export const register = async (req, res) => {
         .json({ ok: false, message: "El correo ya está registrado" });
     }
 
-    const hash = await bcrypt.hash(contrasena, 10);
     const rolFinal = rol || "Participante";
+
+    if (!ROLES_PERMITIDOS.includes(rolFinal)) {
+      return res.status(400).json({
+        ok: false,
+        message:
+          "Rol inválido. Roles permitidos: Editor, Gestor, Administrador, Participante",
+      });
+    }
+
+    const hash = await bcrypt.hash(contrasena, 10);
 
     const result = await query(
       `INSERT INTO persona (nombre, apellido, correo, contrasena_hash, rol)
