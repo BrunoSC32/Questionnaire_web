@@ -21,7 +21,9 @@ import mapaDificultadRoutes from "./routes/mapa_dificultad.routes.js";
 import examenRoutes from "./routes/examen.routes.js";
 import examenPreguntaRoutes from "./routes/examen_pregunta.routes.js";
 import respuestaParticipanteRoutes from "./routes/respuesta_participante.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import { swaggerSpec, swaggerUiMiddleware } from "./config/swagger.js";
+import sessionMiddleware from "./config/session.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,13 +33,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(sessionMiddleware);
 app.use("/docs", swaggerUiMiddleware.serve, swaggerUiMiddleware.setup(swaggerSpec));
-
 
 // Archivos estáticos
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 // Rutas API
+app.use("/api/auth", authRoutes);
 app.use("/api", indexRoutes);
 app.use("/api/preguntas", preguntaRoutes);
 app.use("/api/tipo_preguntas", tipoPreguntaRoutes);
