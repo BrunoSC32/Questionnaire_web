@@ -195,29 +195,33 @@ const seedAllData = async () => {
       [personaIds[0], "Matemáticas", 5],
       [personaIds[1], "Lenguaje", 3],
     ];
+    const editorIds = [];
     for (const row of editoresData) {
       await query(
-        `INSERT INTO editor (id_editor, especialidad, experiencia_anos)
+        `INSERT INTO editor (id_editor, especialidad, experiencia_anios)
          VALUES ($1, $2, $3)`,
         row
       );
+      editorIds.push(row[0]);
     }
 
     // gestor (FK a persona)
     console.log("→ Poblando gestor...");
     const gestoresData = [[personaIds[2], "Educación", "Colegio Central"]];
+    const gestorIds = [];
     for (const row of gestoresData) {
       await query(
         `INSERT INTO gestor (id_gestor, departamento, institucion)
          VALUES ($1, $2, $3)`,
         row
       );
+      gestorIds.push(row[0]);
     }
 
     // administrador (FK a persona)
     console.log("→ Poblando administrador...");
     await query(
-      `INSERT INTO administrador (id_admin, permisos_especiales)
+      `INSERT INTO administrador (id_admin, permisos)
        VALUES ($1, $2)`,
       [personaIds[3], '{"crear_usuarios": true, "editar_ciclos": true}']
     );
@@ -270,7 +274,7 @@ const seedAllData = async () => {
         personaIds[0],
         "2 + 2 = 4",
         "Aritmética básica",
-        "2025-11-20",
+        "2025-11-20T10:00:00",
       ],
       [
         "¿Cuál es la capital de Francia?",
@@ -282,7 +286,7 @@ const seedAllData = async () => {
         personaIds[0],
         "París es la capital de Francia.",
         "Conocimiento geográfico",
-        "2025-11-21",
+        "2025-11-21T10:00:00",
       ],
       [
         "¿Es verdadero que 5 > 3?",
@@ -294,7 +298,7 @@ const seedAllData = async () => {
         personaIds[1],
         "Verdadero. 5 es mayor que 3.",
         "Comparación de números",
-        "2025-11-20",
+        "2025-11-20T10:00:00",
       ],
       [
         "Explica el proceso de fotosíntesis en plantas.",
@@ -306,7 +310,7 @@ const seedAllData = async () => {
         personaIds[1],
         "La fotosíntesis es el proceso mediante el cual las plantas convierten la luz solar en energía química.",
         "Biología básica",
-        "2025-11-19",
+        "2025-11-19T10:00:00",
       ],
       [
         "Resuelve: x + 5 = 12, ¿cuál es el valor de x?",
@@ -318,7 +322,7 @@ const seedAllData = async () => {
         personaIds[0],
         "x = 7 (resolviendo: x + 5 = 12 → x = 12 - 5 = 7)",
         "Ecuaciones lineales simples",
-        "2025-11-18",
+        "2025-11-18T10:00:00",
       ],
     ];
 
@@ -341,49 +345,49 @@ const seedAllData = async () => {
     const respuestasData = [
       // Pregunta 1: ¿Cuánto es 2 + 2?
       [
+        preguntaIds[0],
         "4",
         true,
         "Respuesta correcta.",
-        preguntaIds[0],
       ],
       [
+        preguntaIds[0],
         "5",
         false,
         "Incorrecta.",
-        preguntaIds[0],
       ],
       // Pregunta 2: ¿Cuál es la capital de Francia?
       [
+        preguntaIds[1],
         "París",
         true,
         "Respuesta correcta.",
-        preguntaIds[1],
       ],
       [
+        preguntaIds[1],
         "Lyon",
         false,
         "Lyon es la segunda ciudad más grande, pero no es la capital.",
-        preguntaIds[1],
       ],
       // Pregunta 3: ¿Es verdadero que 5 > 3?
       [
+        preguntaIds[2],
         "Verdadero",
         true,
         "Correcto.",
-        preguntaIds[2],
       ],
       [
+        preguntaIds[2],
         "Falso",
         false,
         "Incorrecto.",
-        preguntaIds[2],
       ],
     ];
 
     const respuestaIds = [];
     for (const row of respuestasData) {
       const result = await query(
-        `INSERT INTO respuesta (texto_respuesta, es_correcta, explicacion, id_pregunta)
+        `INSERT INTO respuesta (id_pregunta, texto_respuesta, es_correcta, explicacion)
          VALUES ($1, $2, $3, $4) RETURNING id_respuesta`,
         row
       );
@@ -418,17 +422,17 @@ const seedAllData = async () => {
       [
         "Examen Matemáticas Básico",
         "Evaluación de operaciones aritméticas básicas",
-        "2025-12-01",
-        "2025-12-08",
-        1,
+        "2025-12-01T08:00:00",
+        "2025-12-08T18:00:00",
+        gestorIds[0],
         cicloIds[0],
       ],
       [
         "Examen Integrado",
         "Prueba que abarca múltiples áreas",
-        "2025-12-10",
-        "2025-12-17",
-        1,
+        "2025-12-10T08:00:00",
+        "2025-12-17T18:00:00",
+        gestorIds[0],
         cicloIds[0],
       ],
     ];
