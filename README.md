@@ -1,51 +1,82 @@
-# Questionnaire Web – Inicialización del Proyecto
+﻿# Questionnaire Web
 
-Proyecto backend en **Node.js + Express** con base de datos **PostgreSQL**
+Backend en **Node.js + Express** con base de datos **PostgreSQL** para la gestión de cuestionarios.
 
-
-## Instalar Dependencias
-
-En la raíz del proyecto ejecutar:
+## Instalación
 
 ```bash
 npm install
-
----
-
-## ⚙️ Crear el Archivo `.env`
 ```
 
-Ajustar los valores según tu entorno de PostgreSQL.
+## Variables de entorno
 
----
+Crea el archivo `.env` en la raíz con, al menos, estos valores (ajusta según tu entorno):
 
-## Seeds 
+```env
+PORT=3000
+HTTPS_PORT=3443
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=questionnaire_db
+SSL_KEY_PATH=C:\certs-questionnaire\key.pem
+SSL_CERT_PATH=C:\certs-questionnaire\cert.pem
+```
 
-Para poblar las tablas de catálogos (`tipo_pregunta`, `estado_pregunta`, `dificultad`, `categoria_edad`, `clasificacion`) ejecutar:
+Si no quieres HTTPS todavía, puedes dejar `SSL_KEY_PATH` y `SSL_CERT_PATH` vacíos y el servidor iniciará sólo en HTTP.
+
+## Seeds
+
+Para poblar los catálogos y datos base:
 
 ```bash
 npm run seed:catalogos
 ```
 
-## Estructura de Archivos del Proyecto
+## Servidor de desarrollo
+
+```bash
+npm run dev
+```
+
+Esto levanta:
+- `http://localhost:3000`
+- `https://localhost:3443` (si existen los certificados configurados)
+
+## HTTPS local paso a paso
+
+1. **Genera certificados autofirmados (PowerShell):**
+	```powershell
+	mkdir C:\certs-questionnaire
+	openssl genrsa -out C:\certs-questionnaire\key.pem 2048
+	openssl req -new -x509 -key C:\certs-questionnaire\key.pem -out C:\certs-questionnaire\cert.pem -days 365
+	```
+	Rellena los campos del `openssl req` con cualquier valor (es sólo para uso local).
+
+2. **Apunta las rutas en `.env`** usando las variables `SSL_KEY_PATH` y `SSL_CERT_PATH` como se muestra arriba.
+
+3. **Arranca el proyecto** con `npm run dev` y abre `https://localhost:3443` en el navegador. Acepta la advertencia del certificado autofirmado (opción “Avanzado” → “Continuar a localhost”).
+
+4. **Postman**: si aparece un error de certificado, desactiva `SSL certificate verification` en `Settings > General` o añade una excepción para `localhost`.
+
+## Estructura básica
 
 ```
 .
 ├─ public/
 ├─ src/
-│  ├─ config/
-│  │  └─ db.js
-│  ├─ routes/
-│  │  └─ index.routes.js
 │  ├─ app.js
-│  └─ server.js
+│  ├─ server.js
+│  ├─ config/
+│  │  ├─ db.js
+│  │  └─ swagger.js
+│  ├─ controllers/
+│  ├─ models/
+│  └─ routes/
+├─ src/seeds/
+│  └─ catalogos.seed.js
 ├─ .env
-├─ .gitignore
-├─ package.json
-└─ README.md
-```
-
-
 ├─ package.json
 └─ README.md
 ```
