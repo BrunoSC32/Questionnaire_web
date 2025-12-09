@@ -6,6 +6,10 @@ import {
   updateTipoPregunta,
   deleteTipoPregunta,
 } from "../controllers/tipo_pregunta.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -38,6 +42,8 @@ const router = express.Router();
  *   get:
  *     summary: Lista todos los tipos de pregunta.
  *     tags: [TipoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Lista de registros.
@@ -55,6 +61,8 @@ const router = express.Router();
  *   post:
  *     summary: Crea un tipo de pregunta.
  *     tags: [TipoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -74,11 +82,26 @@ const router = express.Router();
  *                 data:
  *                   $ref: '#/components/schemas/TipoPregunta'
  */
-router.get("/", getAllTipoPreguntas);
-router.get("/:id", getTipoPregunta);
-router.post("/", createTipoPregunta);
-router.put("/:id", updateTipoPregunta);
-router.delete("/:id", deleteTipoPregunta);
+router.get("/", isAuthenticated, getAllTipoPreguntas);
+router.get("/:id", isAuthenticated, getTipoPregunta);
+router.post(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  createTipoPregunta
+);
+router.put(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  updateTipoPregunta
+);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  deleteTipoPregunta
+);
 
 /**
  * @swagger
@@ -86,6 +109,8 @@ router.delete("/:id", deleteTipoPregunta);
  *   get:
  *     summary: Obtiene un tipo de pregunta.
  *     tags: [TipoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,6 +135,8 @@ router.delete("/:id", deleteTipoPregunta);
  *   put:
  *     summary: Actualiza un tipo de pregunta.
  *     tags: [TipoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -129,6 +156,8 @@ router.delete("/:id", deleteTipoPregunta);
  *   delete:
  *     summary: Elimina un tipo de pregunta.
  *     tags: [TipoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id

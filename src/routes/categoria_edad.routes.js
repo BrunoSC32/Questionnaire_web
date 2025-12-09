@@ -6,6 +6,10 @@ import {
   updateCategoriaEdad,
   deleteCategoriaEdad,
 } from "../controllers/categoria_edad.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -48,6 +52,8 @@ const router = express.Router();
  *   get:
  *     summary: Lista todas las categorías de edad.
  *     tags: [CategoriasEdad]
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Lista de registros.
@@ -65,6 +71,8 @@ const router = express.Router();
  *   post:
  *     summary: Crea una categoría de edad.
  *     tags: [CategoriasEdad]
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -84,11 +92,26 @@ const router = express.Router();
  *                 data:
  *                   $ref: '#/components/schemas/CategoriaEdad'
  */
-router.get("/", getAllCategoriasEdad);
-router.get("/:id", getCategoriaEdad);
-router.post("/", createCategoriaEdad);
-router.put("/:id", updateCategoriaEdad);
-router.delete("/:id", deleteCategoriaEdad);
+router.get("/", isAuthenticated, getAllCategoriasEdad);
+router.get("/:id", isAuthenticated, getCategoriaEdad);
+router.post(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador"),
+  createCategoriaEdad
+);
+router.put(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador"),
+  updateCategoriaEdad
+);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador"),
+  deleteCategoriaEdad
+);
 
 /**
  * @swagger
@@ -96,6 +119,8 @@ router.delete("/:id", deleteCategoriaEdad);
  *   get:
  *     summary: Obtiene una categoría de edad.
  *     tags: [CategoriasEdad]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -120,6 +145,8 @@ router.delete("/:id", deleteCategoriaEdad);
  *   put:
  *     summary: Actualiza una categoría de edad.
  *     tags: [CategoriasEdad]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -139,6 +166,8 @@ router.delete("/:id", deleteCategoriaEdad);
  *   delete:
  *     summary: Elimina una categoría de edad.
  *     tags: [CategoriasEdad]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id

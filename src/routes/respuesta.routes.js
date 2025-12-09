@@ -6,13 +6,42 @@ import {
   updateRespuesta,
   deleteRespuesta,
 } from "../controllers/respuesta.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllRespuestas);
-router.get("/:id", getRespuesta);
-router.post("/", createRespuesta);
-router.put("/:id", updateRespuesta);
-router.delete("/:id", deleteRespuesta);
+router.get(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Editor", "Gestor"),
+  getAllRespuestas
+);
+router.get(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor", "Gestor"),
+  getRespuesta
+);
+router.post(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  createRespuesta
+);
+router.put(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  updateRespuesta
+);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  deleteRespuesta
+);
 
 export default router;

@@ -6,6 +6,10 @@ import {
   updateDificultad,
   deleteDificultad,
 } from "../controllers/dificultad.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -43,6 +47,8 @@ const router = express.Router();
  *   get:
  *     summary: Lista todos los niveles de dificultad.
  *     tags: [Dificultades]
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Lista de registros.
@@ -60,6 +66,8 @@ const router = express.Router();
  *   post:
  *     summary: Crea un nivel de dificultad.
  *     tags: [Dificultades]
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -79,11 +87,26 @@ const router = express.Router();
  *                 data:
  *                   $ref: '#/components/schemas/Dificultad'
  */
-router.get("/", getAllDificultades);
-router.get("/:id", getDificultad);
-router.post("/", createDificultad);
-router.put("/:id", updateDificultad);
-router.delete("/:id", deleteDificultad);
+router.get("/", isAuthenticated, getAllDificultades);
+router.get("/:id", isAuthenticated, getDificultad);
+router.post(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  createDificultad
+);
+router.put(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  updateDificultad
+);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  deleteDificultad
+);
 
 /**
  * @swagger
@@ -91,6 +114,8 @@ router.delete("/:id", deleteDificultad);
  *   get:
  *     summary: Obtiene un nivel de dificultad.
  *     tags: [Dificultades]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -115,6 +140,8 @@ router.delete("/:id", deleteDificultad);
  *   put:
  *     summary: Actualiza un nivel de dificultad.
  *     tags: [Dificultades]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -134,6 +161,8 @@ router.delete("/:id", deleteDificultad);
  *   delete:
  *     summary: Elimina un nivel de dificultad.
  *     tags: [Dificultades]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id

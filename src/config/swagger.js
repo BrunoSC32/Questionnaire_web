@@ -14,8 +14,19 @@ const swaggerOptions = {
         url: "http://localhost:3000/api",
       },
     ],
+    components: {
+      securitySchemes: {
+        sessionAuth: {
+          type: "apiKey",
+          in: "cookie",
+          name: "connect.sid",
+          description:
+            "Autenticación basada en sesión. Inicia sesión para obtener la cookie de sesión.",
+        },
+      },
+    },
   },
-  apis: ["./src/routes/*.js"], 
+  apis: ["./src/routes/*.js"],
 };
 
 export const swaggerSpec = swaggerJSDoc(swaggerOptions);

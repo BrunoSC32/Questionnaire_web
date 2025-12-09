@@ -6,13 +6,17 @@ import {
   updateEditor,
   deleteEditor,
 } from "../controllers/editor.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllEditors);
-router.get("/:id", getEditor);
-router.post("/", createEditor);
-router.put("/:id", updateEditor);
-router.delete("/:id", deleteEditor);
+router.get("/", isAuthenticated, hasRole("Administrador"), getAllEditors);
+router.get("/:id", isAuthenticated, hasRole("Administrador"), getEditor);
+router.post("/", isAuthenticated, hasRole("Administrador"), createEditor);
+router.put("/:id", isAuthenticated, hasRole("Administrador"), updateEditor);
+router.delete("/:id", isAuthenticated, hasRole("Administrador"), deleteEditor);
 
 export default router;
