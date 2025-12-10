@@ -6,13 +6,17 @@ import {
   updateGestor,
   deleteGestor,
 } from "../controllers/gestor.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllGestores);
-router.get("/:id", getGestor);
-router.post("/", createGestor);
-router.put("/:id", updateGestor);
-router.delete("/:id", deleteGestor);
+router.get("/", isAuthenticated, hasRole("Administrador"), getAllGestores);
+router.get("/:id", isAuthenticated, hasRole("Administrador"), getGestor);
+router.post("/", isAuthenticated, hasRole("Administrador"), createGestor);
+router.put("/:id", isAuthenticated, hasRole("Administrador"), updateGestor);
+router.delete("/:id", isAuthenticated, hasRole("Administrador"), deleteGestor);
 
 export default router;

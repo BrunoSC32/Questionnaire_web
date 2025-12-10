@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { login, logout, me, register } from "../controllers/auth.controller.js";
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -73,11 +74,13 @@ router.post("/login", login);
  *     summary: Cerrar sesión
  *     tags:
  *       - Auth
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Sesión cerrada correctamente
  */
-router.post("/logout", logout);
+router.post("/logout", isAuthenticated, logout);
 
 /**
  * @swagger
@@ -86,12 +89,14 @@ router.post("/logout", logout);
  *     summary: Obtener usuario autenticado actual
  *     tags:
  *       - Auth
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Usuario autenticado
  *       401:
  *         description: No autenticado
  */
-router.get("/me", me);
+router.get("/me", isAuthenticated, me);
 
 export default router;

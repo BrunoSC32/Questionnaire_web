@@ -6,6 +6,10 @@ import {
   updateEstadoPregunta,
   deleteEstadoPregunta,
 } from "../controllers/estado_pregunta.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -38,6 +42,8 @@ const router = express.Router();
  *   get:
  *     summary: Lista todos los estados de pregunta.
  *     tags: [EstadoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Lista de registros.
@@ -55,6 +61,8 @@ const router = express.Router();
  *   post:
  *     summary: Crea un estado de pregunta.
  *     tags: [EstadoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -74,11 +82,26 @@ const router = express.Router();
  *                 data:
  *                   $ref: '#/components/schemas/EstadoPregunta'
  */
-router.get("/", getAllEstadoPreguntas);
-router.get("/:id", getEstadoPregunta);
-router.post("/", createEstadoPregunta);
-router.put("/:id", updateEstadoPregunta);
-router.delete("/:id", deleteEstadoPregunta);
+router.get("/", isAuthenticated, getAllEstadoPreguntas);
+router.get("/:id", isAuthenticated, getEstadoPregunta);
+router.post(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  createEstadoPregunta
+);
+router.put(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  updateEstadoPregunta
+);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  deleteEstadoPregunta
+);
 
 /**
  * @swagger
@@ -86,6 +109,8 @@ router.delete("/:id", deleteEstadoPregunta);
  *   get:
  *     summary: Obtiene un estado de pregunta.
  *     tags: [EstadoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,6 +135,8 @@ router.delete("/:id", deleteEstadoPregunta);
  *   put:
  *     summary: Actualiza un estado de pregunta.
  *     tags: [EstadoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -129,6 +156,8 @@ router.delete("/:id", deleteEstadoPregunta);
  *   delete:
  *     summary: Elimina un estado de pregunta.
  *     tags: [EstadoPreguntas]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id

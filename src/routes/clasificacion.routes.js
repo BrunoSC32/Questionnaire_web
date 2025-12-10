@@ -6,6 +6,10 @@ import {
   updateClasificacion,
   deleteClasificacion,
 } from "../controllers/clasificacion.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -43,6 +47,8 @@ const router = express.Router();
  *   get:
  *     summary: Lista todas las clasificaciones.
  *     tags: [Clasificaciones]
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: Lista de registros.
@@ -60,6 +66,8 @@ const router = express.Router();
  *   post:
  *     summary: Crea una clasificación.
  *     tags: [Clasificaciones]
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -79,11 +87,26 @@ const router = express.Router();
  *                 data:
  *                   $ref: '#/components/schemas/Clasificacion'
  */
-router.get("/", getAllClasificaciones);
-router.get("/:id", getClasificacion);
-router.post("/", createClasificacion);
-router.put("/:id", updateClasificacion);
-router.delete("/:id", deleteClasificacion);
+router.get("/", isAuthenticated, getAllClasificaciones);
+router.get("/:id", isAuthenticated, getClasificacion);
+router.post(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  createClasificacion
+);
+router.put(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  updateClasificacion
+);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Editor"),
+  deleteClasificacion
+);
 
 /**
  * @swagger
@@ -91,6 +114,8 @@ router.delete("/:id", deleteClasificacion);
  *   get:
  *     summary: Obtiene una clasificación.
  *     tags: [Clasificaciones]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -115,6 +140,8 @@ router.delete("/:id", deleteClasificacion);
  *   put:
  *     summary: Actualiza una clasificación.
  *     tags: [Clasificaciones]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -134,6 +161,8 @@ router.delete("/:id", deleteClasificacion);
  *   delete:
  *     summary: Elimina una clasificación.
  *     tags: [Clasificaciones]
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
  *       - in: path
  *         name: id

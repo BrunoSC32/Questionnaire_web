@@ -6,13 +6,32 @@ import {
   updateExamen,
   deleteExamen,
 } from "../controllers/examen.controller.js";
+import {
+  isAuthenticated,
+  hasRole,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllExamenes);
-router.get("/:id", getExamen);
-router.post("/", createExamen);
-router.put("/:id", updateExamen);
-router.delete("/:id", deleteExamen);
+router.get(
+  "/",
+  isAuthenticated,
+  hasRole("Administrador", "Gestor", "Editor", "Participante"),
+  getAllExamenes
+);
+router.get(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Gestor", "Editor", "Participante"),
+  getExamen
+);
+router.post("/", isAuthenticated, hasRole("Administrador", "Gestor"), createExamen);
+router.put("/:id", isAuthenticated, hasRole("Administrador", "Gestor"), updateExamen);
+router.delete(
+  "/:id",
+  isAuthenticated,
+  hasRole("Administrador", "Gestor"),
+  deleteExamen
+);
 
 export default router;
