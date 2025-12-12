@@ -11,7 +11,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000/api",
+        url: "/api",
+        description: "Usa el mismo origen (HTTP/HTTPS) con el que abriste Swagger",
       },
     ],
     components: {

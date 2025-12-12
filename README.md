@@ -42,7 +42,7 @@ npm run dev
 
 Esto levanta:
 - `http://localhost:3000`
-- `https://localhost:3443` (si existen los certificados configurados)
+- `https://localhost:3443` (HTTP/2 + TLS si existen los certificados configurados)
 
 ## HTTPS local paso a paso
 
@@ -56,7 +56,7 @@ Esto levanta:
 
 2. **Apunta las rutas en `.env`** usando las variables `SSL_KEY_PATH` y `SSL_CERT_PATH` como se muestra arriba.
 
-3. **Arranca el proyecto** con `npm run dev` y abre `https://localhost:3443` en el navegador. Acepta la advertencia del certificado autofirmado (opción “Avanzado” → “Continuar a localhost”).
+3. **Arranca el proyecto** con `npm run dev` y abre `https://localhost:3443` en el navegador. Acepta la advertencia del certificado autofirmado (opción “Avanzado” → “Continuar a localhost”). Tu navegador negociará HTTP/2 automáticamente (caerá a HTTP/1.1 si no lo soporta).
 
 4. **Postman**: si aparece un error de certificado, desactiva `SSL certificate verification` en `Settings > General` o añade una excepción para `localhost`.
 

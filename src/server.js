@@ -4,7 +4,7 @@ dotenv.config();
 
 import fs from "fs";
 import http from "http";
-import https from "https";
+import http2 from "http2";
 import app from "./app.js";
 import pool from "./config/db.js";
 
@@ -41,11 +41,18 @@ if (canStartHttps) {
   const httpsOptions = {
     key: fs.readFileSync(sslKeyPath),
     cert: fs.readFileSync(sslCertPath),
+    allowHTTP1: true, // Express trabaja sobre HTTP/1.1 pero habilitamos HTTP/2 cuando el cliente lo soporte
   };
 
-  const httpsServer = https.createServer(httpsOptions, app);
-  httpsServer.listen(HTTPS_PORT, () => {
-    console.log(`Servidor HTTPS escuchando en https://localhost:${HTTPS_PORT}`);
+  const http2Server = http2.createSecureServer(httpsOptions, app);
+  http2Server.on("sessionError", (err) => {
+    console.error("Error en sesión HTTP/2:", err);
+  });
+
+  http2Server.listen(HTTPS_PORT, () => {
+    console.log(
+      `Servidor HTTP/2+TLS escuchando en https://localhost:${HTTPS_PORT}`
+    );
     testDbConnection();
   });
 } else {
