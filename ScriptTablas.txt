@@ -1,0 +1,143 @@
+-- 1. Catálogos
+CREATE TABLE tipo_pregunta (
+  id_tipo_pregunta SERIAL PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  descripcion TEXT
+);
+
+CREATE TABLE estado_pregunta (
+  id_estado_pregunta SERIAL PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL,
+  descripcion TEXT
+);
+
+CREATE TABLE dificultad (
+  id_dificultad SERIAL PRIMARY KEY,
+  nivel VARCHAR(50) NOT NULL, -- 'facil','medio','dificil'
+  descripcion TEXT
+);
+
+CREATE TABLE categoria_edad (
+  id_categoria_edad SERIAL PRIMARY KEY,
+  edad_min INT NOT NULL,
+  edad_max INT NOT NULL,
+  descripcion TEXT
+);
+
+CREATE TABLE clasificacion (
+  id_clasificacion SERIAL PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  subarea VARCHAR(150),
+  descripcion TEXT
+);
+
+-- 2. Persona (base para usuarios con roles)
+CREATE TABLE persona (
+  id_persona SERIAL PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  apellido VARCHAR(150),
+  correo VARCHAR(255) UNIQUE NOT NULL,
+  contrasena_hash VARCHAR(255) NOT NULL,
+  rol VARCHAR(50) NOT NULL, -- puedes mantener texto o normalizar a tabla rol
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Roles especializados (fks a persona)
+CREATE TABLE editor (
+  id_editor INT PRIMARY KEY REFERENCES persona(id_persona) ON DELETE CASCADE,
+  especialidad VARCHAR(200),
+  experiencia_anios INT DEFAULT 0
+);
+
+CREATE TABLE gestor (
+  id_gestor INT PRIMARY KEY REFERENCES persona(id_persona) ON DELETE CASCADE,
+  departamento VARCHAR(200),
+  institucion VARCHAR(200)
+);
+
+CREATE TABLE administrador (
+  id_admin INT PRIMARY KEY REFERENCES persona(id_persona) ON DELETE CASCADE,
+  permisos JSONB
+);
+
+CREATE TABLE participante (
+  id_participante INT PRIMARY KEY REFERENCES persona(id_persona) ON DELETE CASCADE,
+  edad INT,
+  categoria_asignada INT REFERENCES categoria_edad(id_categoria_edad)
+);
+
+-- 4. Ciclo
+CREATE TABLE ciclo (
+  id_ciclo SERIAL PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  estado VARCHAR(50)
+);
+
+-- 5. Pregunta (depende de editor y catálogos)
+CREATE TABLE pregunta (
+  id_pregunta SERIAL PRIMARY KEY,
+  enunciado TEXT NOT NULL,
+  id_tipo_pregunta INT NOT NULL REFERENCES tipo_pregunta(id_tipo_pregunta),
+  id_estado_pregunta INT NOT NULL REFERENCES estado_pregunta(id_estado_pregunta),
+  id_categoria_edad INT NOT NULL REFERENCES categoria_edad(id_categoria_edad),
+  id_dificultad INT NOT NULL REFERENCES dificultad(id_dificultad),
+  id_clasificacion INT NOT NULL REFERENCES clasificacion(id_clasificacion),
+  id_editor_creador INT NOT NULL REFERENCES editor(id_editor),
+  explicacion_solucion TEXT,
+  razon_area TEXT,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_publicacion TIMESTAMP
+);
+
+-- 6. Respuesta (varias por pregunta)
+CREATE TABLE respuesta (
+  id_respuesta SERIAL PRIMARY KEY,
+  id_pregunta INT NOT NULL REFERENCES pregunta(id_pregunta) ON DELETE CASCADE,
+  texto_respuesta TEXT NOT NULL,
+  es_correcta BOOLEAN DEFAULT FALSE,
+  explicacion TEXT
+);
+
+-- 7. Mapa de dificultad (mapeo por edad)
+CREATE TABLE mapa_dificultad (
+  id_mapeo SERIAL PRIMARY KEY,
+  id_pregunta INT NOT NULL REFERENCES pregunta(id_pregunta) ON DELETE CASCADE,
+  id_categoria_edad INT NOT NULL REFERENCES categoria_edad(id_categoria_edad),
+  id_dificultad_asignada INT NOT NULL REFERENCES dificultad(id_dificultad),
+  id_dificultad_base INT REFERENCES dificultad(id_dificultad),
+  editable_por_editor BOOLEAN DEFAULT TRUE,
+  UNIQUE (id_pregunta, id_categoria_edad)
+);
+
+-- 8. Examen / Cuestionario
+CREATE TABLE examen (
+  id_examen SERIAL PRIMARY KEY,
+  titulo VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  fecha_inicio TIMESTAMP,
+  fecha_fin TIMESTAMP,
+  id_gestor INT REFERENCES gestor(id_gestor),
+  id_ciclo INT REFERENCES ciclo(id_ciclo)
+);
+
+-- 9. ExamenPregunta (N:M)
+CREATE TABLE examen_pregunta (
+  id_examen_pregunta SERIAL PRIMARY KEY,
+  id_examen INT NOT NULL REFERENCES examen(id_examen) ON DELETE CASCADE,
+  id_pregunta INT NOT NULL REFERENCES pregunta(id_pregunta) ON DELETE CASCADE,
+  orden INT
+);
+
+-- 10. RespuestaParticipante
+CREATE TABLE respuesta_participante (
+  id_respuesta_participante SERIAL PRIMARY KEY,
+  id_participante INT NOT NULL REFERENCES participante(id_participante) ON DELETE CASCADE,
+  id_examen INT REFERENCES examen(id_examen),
+  id_pregunta INT NOT NULL REFERENCES pregunta(id_pregunta) ON DELETE CASCADE,
+  id_respuesta INT REFERENCES respuesta(id_respuesta),
+  respuesta_texto TEXT,
+  puntaje_obtenido NUMERIC,
+  fecha_respuesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
